@@ -1,0 +1,11 @@
+{
+  "title": "Pirano Tiles",
+  "description": "Tape les tuiles noires sans en rater une, la vitesse monte et les effets s'enflamment !",
+  "author": "Léo",
+  "category": "Arcade",
+  "emoji": "🎹",
+  "joueurs": "1",
+  "image": "cover.png",
+  "classement": "score",
+  "unite": "tuiles"
+}

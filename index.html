@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pirano Tiles</title>
+<link rel="stylesheet" href="style.css">
+<script src="/_sdk.js"></script>
+</head>
+<body>
+<div id="app">
+  <canvas id="c"></canvas>
+
+  <div id="hud">
+    <div class="chip" id="meChip"></div>
+    <div id="scoreBox"><div id="score">0</div><div id="tps">⚡ 0.0 /s</div></div>
+    <div class="btns">
+      <button class="btn" id="btnRules" aria-label="Règles">❓</button>
+      <button class="btn" id="btnSound" aria-label="Son">🔊</button>
+    </div>
+  </div>
+
+  <div id="hint" hidden>Touche la tuile noire pour démarrer !</div>
+
+  <!-- Accueil -->
+  <div class="ov" id="menu">
+    <div class="card">
+      <h1>🎹 Pirano Tiles</h1>
+      <p class="sub">Ne touche que les tuiles noires… et ne rate rien !</p>
+      <div class="label">Mélodie</div>
+      <div id="songs"></div>
+      <button class="play" id="btnPlay">▶ JOUER</button>
+      <p class="keys">Clavier : <b>D F J K</b> · Tactile : tape les tuiles</p>
+      <div id="hubBox" hidden>
+        <div class="label">🏆 Classement du hub</div>
+        <ol id="topList"></ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fin de partie -->
+  <div class="ov" id="over" hidden>
+    <div class="card">
+      <div id="overMe" class="meRow"></div>
+      <div class="label">Ton score</div>
+      <div id="overScore">0</div>
+      <div id="overUnit">tuiles</div>
+      <div id="overMsg"></div>
+      <div id="overRec" hidden>🏆 NOUVEAU RECORD DU HUB !</div>
+      <div id="overBest"></div>
+      <div class="row2">
+        <button class="play" id="btnAgain">↻ REJOUER</button>
+        <button class="ghost" id="btnMenu">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Règles -->
+  <div class="ov modal" id="rules" hidden>
+    <div class="card rulesCard">
+      <h2>❓ Règles</h2>
+      <ul>
+        <li><b>But :</b> taper les tuiles noires l'une après l'autre, de bas en haut, sans en rater une seule.</li>
+        <li><b>Comment jouer :</b> sur téléphone, tape directement la tuile noire. Sur PC, clique ou utilise les touches <b>D F J K</b> (une par colonne).</li>
+        <li><b>Mélodie :</b> chaque tuile jouée fait sonner la note suivante du morceau. Bien jouer, c'est jouer juste !</li>
+        <li><b>Comment on gagne :</b> il n'y a pas de victoire, ton score = le nombre de tuiles réussies. Bats le record du hub !</li>
+        <li><b>Tu perds si :</b> tu touches une tuile blanche, ou si une tuile noire sort par le bas de l'écran.</li>
+        <li><b>La vitesse monte</b> sans arrêt. Paliers épiques à 10, 25, 50, 75 et 100 tuiles 🔥</li>
+        <li><b>Pause :</b> en ouvrant les règles ou en quittant l'onglet, la partie se met en pause (compte à rebours 3-2-1 au retour).</li>
+      </ul>
+      <button class="play" id="btnRulesClose">J'ai compris !</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

@@ -342,12 +342,13 @@
     const col = Math.min(COLS - 1, Math.floor((x - bx) / colW));
     press(col, Math.floor((H - y + scroll) / rowH));
   });
-  const KEYS = { d: 0, f: 1, j: 2, k: 3 };
+  // Rangée de chiffres du haut : & é " ' (AZERTY) = Digit1 à Digit4, quelle que soit la disposition
+  const KEYS = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Numpad1: 0, Numpad2: 1, Numpad3: 2, Numpad4: 3 };
   window.addEventListener('keydown', (e) => {
     if (e.repeat) return;
     const k = e.key.toLowerCase();
     if (rulesOpen) { if (k === 'escape' || k === 'enter') closeRules(); return; }
-    if (k in KEYS) { if ((state === 'ready' || state === 'play') && !paused) press(KEYS[k], null); return; }
+    if (e.code in KEYS) { if ((state === 'ready' || state === 'play') && !paused) press(KEYS[e.code], null); return; }
     if (k === 'enter' || k === ' ') {
       if (state === 'menu') $('#btnPlay').click();
       else if (!$('#over').hidden) startGame();

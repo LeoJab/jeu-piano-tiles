@@ -287,6 +287,7 @@
     loadBoard();
   }
   function startGame() {
+    if (listening !== -1) { listening = -1; keyMsg(''); renderBinds(); }
     $('#menu').hidden = true; $('#over').hidden = true; $('#scoreBox').style.opacity = 1;
     state = 'ready'; paused = false; pauseReason = ''; failInfo = null;
     rows = []; hits = 0; scroll = 0; rps = 2.6; banner = null; taps = [];
@@ -336,19 +337,82 @@
   /* ---------- Entrées ---------- */
   cv.addEventListener('pointerdown', (e) => {
     e.preventDefault();
+    if (!e.isTrusted) return;
     if ((state !== 'ready' && state !== 'play') || paused) return;
     const x = e.clientX, y = e.clientY;
     if (x < bx || x >= bx + bw || y < 0 || y >= H) return;
     const col = Math.min(COLS - 1, Math.floor((x - bx) / colW));
     press(col, Math.floor((H - y + scroll) / rowH));
   });
-  // Rangée de chiffres du haut : & é " ' (AZERTY) = Digit1 à Digit4, quelle que soit la disposition
-  const KEYS = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Numpad1: 0, Numpad2: 1, Numpad3: 2, Numpad4: 3 };
+  // Touches personnalisables (une par colonne, enregistrées par position de touche)
+  const DEFAULT_BINDS = [{ code: 'Digit1', label: '&' }, { code: 'Digit2', label: 'é' }, { code: 'Digit3', label: '"' }, { code: 'Digit4', label: "'" }];
+  const OK_CODE = /^(Key[A-Z]|Digit\d|Numpad\d|Arrow(Left|Right|Up|Down)|Semicolon|Comma|Period|Slash|Quote|Backquote|BracketLeft|BracketRight|Backslash|Minus|Equal|IntlBackslash)$/;
+  const NUMPAD = { Numpad1: 'Digit1', Numpad2: 'Digit2', Numpad3: 'Digit3', Numpad4: 'Digit4' };
+  const ARROWS = { ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓' };
+  let listening = -1;
+  function loadBinds() {
+    try {
+      const b = JSON.parse(store('pt_keys'));
+      if (Array.isArray(b) && b.length === COLS && b.every((x) => x && OK_CODE.test(x.code)) &&
+          new Set(b.map((x) => x.code)).size === COLS) return b.map((x) => ({ code: x.code, label: String(x.label || x.code).slice(0, 3) }));
+    } catch (e) { /* valeurs par défaut */ }
+    return DEFAULT_BINDS.map((x) => ({ ...x }));
+  }
+  let binds = loadBinds();
+  const labelOf = (e) => ARROWS[e.code] || (e.key && e.key.length === 1 ? e.key.toUpperCase() : e.code);
+  function colForCode(code) {
+    let i = binds.findIndex((b) => b.code === code);
+    if (i === -1 && NUMPAD[code] && !binds.some((b) => b.code === code)) i = binds.findIndex((b) => b.code === NUMPAD[code]);
+    return i;
+  }
+  const keyMsg = (t) => { $('#keyMsg').textContent = t || ''; };
+  function renderBinds() {
+    const box = $('#keyBinds');
+    box.innerHTML = '';
+    binds.forEach((b, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'kb' + (listening === i ? ' on' : '');
+      btn.innerHTML = '<small>Colonne ' + (i + 1) + '</small>';
+      const l = document.createElement('b');
+      l.textContent = listening === i ? '…' : b.label;
+      btn.appendChild(l);
+      btn.addEventListener('click', () => {
+        listening = listening === i ? -1 : i;
+        keyMsg(listening === -1 ? '' : 'Appuie sur la nouvelle touche (Échap pour annuler)');
+        renderBinds(); btn.blur();
+      });
+      box.appendChild(btn);
+    });
+    const rk = $('#rulesKeys');
+    if (rk) rk.textContent = binds.map((b) => b.label).join('  ');
+  }
+  function captureKey(e) {
+    if (e.code === 'Escape') { listening = -1; keyMsg(''); renderBinds(); return; }
+    if (!OK_CODE.test(e.code)) { keyMsg('Cette touche n\'est pas autorisée.'); return; }
+    const dup = binds.findIndex((b, i) => i !== listening && b.code === e.code);
+    if (dup !== -1) { keyMsg('Déjà utilisée par la colonne ' + (dup + 1) + '.'); return; }
+    binds[listening] = { code: e.code, label: labelOf(e) };
+    store('pt_keys', JSON.stringify(binds));
+    listening = -1; keyMsg(''); renderBinds();
+  }
+  $('#btnKeyReset').addEventListener('click', () => {
+    binds = DEFAULT_BINDS.map((x) => ({ ...x })); listening = -1;
+    store('pt_keys', JSON.stringify(binds)); keyMsg(''); renderBinds();
+  });
+  renderBinds();
+
   window.addEventListener('keydown', (e) => {
-    if (e.repeat) return;
+    if (!e.isTrusted || e.repeat) return;      // anti-triche : pas d'évènements simulés ni de répétition auto
+    if (listening !== -1) { e.preventDefault(); captureKey(e); return; }
     const k = e.key.toLowerCase();
     if (rulesOpen) { if (k === 'escape' || k === 'enter') closeRules(); return; }
-    if (e.code in KEYS) { if ((state === 'ready' || state === 'play') && !paused) press(KEYS[e.code], null); return; }
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    const col = colForCode(e.code);
+    if (col !== -1) {
+      e.preventDefault();
+      if ((state === 'ready' || state === 'play') && !paused) press(col, null);
+      return;
+    }
     if (k === 'enter' || k === ' ') {
       if (state === 'menu') $('#btnPlay').click();
       else if (!$('#over').hidden) startGame();

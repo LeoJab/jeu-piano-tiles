@@ -30,7 +30,11 @@
       <div class="label">Mélodie</div>
       <div id="songs"></div>
       <button class="play" id="btnPlay">▶ JOUER</button>
-      <p class="keys">Clavier : <b>&amp; é " '</b> (rangée du haut) · Tactile : tape les tuiles</p>
+      <div class="label">Touches (PC)</div>
+      <div id="keyBinds"></div>
+      <div id="keyMsg"></div>
+      <button class="link" id="btnKeyReset">↺ Touches par défaut</button>
+      <p class="keys">Tactile : tape directement les tuiles.</p>
       <div id="hubBox" hidden>
         <div class="label">🏆 Classement du hub</div>
         <ol id="topList"></ol>
@@ -61,11 +65,12 @@
       <h2>❓ Règles</h2>
       <ul>
         <li><b>But :</b> taper les tuiles noires l'une après l'autre, de bas en haut, sans en rater une seule.</li>
-        <li><b>Comment jouer :</b> sur téléphone, tape directement la tuile noire. Sur PC, clique ou utilise les touches <b>&amp; é " '</b> de la rangée du haut (une par colonne).</li>
+        <li><b>Comment jouer :</b> sur téléphone, tape directement la tuile noire. Sur PC, clique ou utilise tes touches : <b id="rulesKeys"></b> (une par colonne, modifiables dans le menu).</li>
         <li><b>Mélodie :</b> chaque tuile jouée fait sonner la note suivante du morceau. Bien jouer, c'est jouer juste !</li>
         <li><b>Comment on gagne :</b> il n'y a pas de victoire, ton score = le nombre de tuiles réussies. Bats le record du hub !</li>
         <li><b>Tu perds si :</b> tu touches une tuile blanche, ou si une tuile noire sort par le bas de l'écran.</li>
         <li><b>La vitesse monte</b> sans arrêt. Paliers épiques à 10, 25, 50, 75 et 100 tuiles 🔥</li>
+        <li><b>Touches :</b> une touche différente par colonne. Les touches Entrée, Espace, Échap, Maj, Ctrl, Alt… sont interdites, et seules les vraies frappes au clavier comptent (pas de macro ni de répétition automatique).</li>
         <li><b>Pause :</b> en ouvrant les règles ou en quittant l'onglet, la partie se met en pause (compte à rebours 3-2-1 au retour).</li>
       </ul>
       <button class="play" id="btnRulesClose">J'ai compris !</button>
